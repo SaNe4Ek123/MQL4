@@ -18,7 +18,6 @@ class ClassTrade
     
       ClassAccountingOrders AccountOrders;
       ClassOrder Orders[];
-      ClassTargets Targets;
       
      //------- Methods ------- 
       int  CreateOrder();
@@ -28,6 +27,7 @@ class ClassTrade
     
      //------- Properties -------
       ClassOrder Order;
+      ClassTargets Targets;
      
      //------- Methods -------
             ClassTrade();
@@ -100,6 +100,7 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
       {
         int i = ArraySize( this.Orders ) - 1;
         
+        this.CreateOrder();
         this.Orders[i].Init( this.Order.Ticket );
         this.Order.Clear();
       }
@@ -220,5 +221,7 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
 //+------------------------------------------------------------------+
  void ClassTrade::TrackOrders()
    {
-     
+     for( int i=0; i<ArraySize( this.Orders ); i++ )
+       this.TrackOrder( this.Orders[i] );
    }    
+   
