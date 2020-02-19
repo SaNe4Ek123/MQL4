@@ -21,7 +21,8 @@ class ClassTrade
       ClassTargets Targets;
       
      //------- Methods ------- 
-      int CreateOrder();
+      int  CreateOrder();
+      bool TrackOrder( ClassOrder &order );
       
     public:
     
@@ -34,6 +35,7 @@ class ClassTrade
       void  Create( string symbol_, int magic_ );
       bool  OpenOrder();
       void  CloseAllOrders();
+      void  TrackOrders();
       void  Init();
   };
   
@@ -112,4 +114,111 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
   {
     for( int i=0; i<ArraySize( this.Orders ); i++ )
       this.Orders[i].Close();
-  }  
+  }
+  
+  
+//+------------------------------------------------------------------+
+ bool ClassTrade::TrackOrder( ClassOrder &order )
+   {
+     switch( order.Type )
+      {
+        case OP_BUY:
+         {
+           if( order.Virtual )
+            {
+              if( order.TakeProfit > 0 && Bid >= order.TakeProfit )
+               order.Close();
+               
+              if( order.StopLoss > 0 && Bid <= order.StopLoss )
+               order.Close();
+               
+              return true;  
+            }
+         }
+         
+        case OP_SELL:
+         {
+           if( order.Virtual )
+            {
+              if( order.TakeProfit > 0 && Bid <= order.TakeProfit )
+               order.Close();
+               
+              if( order.StopLoss > 0 && Bid >= order.StopLoss )
+               order.Close();
+               
+              return true;
+            }
+         }
+         
+         
+        case OP_BUYSTOP:
+         {
+           if( order.Ticket == 0 )
+            {
+               if( Ask >= order.OpenPrice )
+                  {
+                    order.Type = OP_BUY;
+                    order.Send();
+                    
+                    
+                    return true;
+                  }
+            } 
+         }
+         
+         
+        case OP_SELLSTOP:
+         {
+           if( order.Ticket == 0 )
+            {
+               if( Bid <= order.OpenPrice )
+                  {
+                    order.Type = OP_SELL;
+                    order.Send();
+                    
+                    return true;
+                  }
+            } 
+         }
+         
+         
+        case OP_BUYLIMIT:
+         {
+           if( order.Ticket == 0 )
+            {
+               if( Ask <= order.OpenPrice )
+                  {
+                    order.Type = OP_BUY;
+                    order.Send();
+                    
+                    return true;
+                  }
+            } 
+         }
+         
+        case OP_SELLLIMIT:
+         {
+           if( order.Ticket == 0 )
+            {
+               if( Ask >= order.OpenPrice )
+                  {
+                    order.Type = OP_SELL;
+                    order.Send();
+                    
+                    return true;
+                  }
+            } 
+         }
+         
+         
+      }
+      
+     return false;
+   }  
+
+
+//+------------------------------------------------------------------+
+ void ClassTrade::TrackOrders()
+   {
+     
+   }    
