@@ -11,7 +11,7 @@ class ClassZigZag
    
     public:
      //------- PROPERTIES --------
-      ClassZigZagLevel ZZLevels[];
+      ClassZigZagLevel Levels[];
 
      //------- METHODS -------- 
             ClassZigZag();
@@ -56,7 +56,7 @@ void ClassZigZag::~ClassZigZag()
 //------------------- ZigZagLevels ----------
  void ClassZigZag::Init()
   {
-    ArrayResize(this.ZZLevels, 0);
+    ArrayResize(this.Levels, 0);
     for(int i=0; i<=this.cnt_bars; i++)
       {
         int InpDepth=this.period_zz;  // Depth
@@ -71,20 +71,20 @@ void ClassZigZag::~ClassZigZag()
         HideTestIndicators(false);
         if( zz_price > 0 )
           {
-            int arr_size = ArraySize(this.ZZLevels);
-            ArrayResize(this.ZZLevels, arr_size+1);
+            int arr_size = ArraySize(this.Levels);
+            ArrayResize(this.Levels, arr_size+1);
             
-            this.ZZLevels[arr_size].index_bar  = i;
-            this.ZZLevels[arr_size].level_high = iHigh(this.symbol, this.timeframe, i );
-            this.ZZLevels[arr_size].level_low  = iLow(this.symbol, this.timeframe, i );
-            this.ZZLevels[arr_size].timeframe  = this.timeframe;
-            this.ZZLevels[arr_size].symbol     = this.symbol;
+            this.Levels[arr_size].index_bar  = i;
+            this.Levels[arr_size].level_high = iHigh(this.symbol, this.timeframe, i );
+            this.Levels[arr_size].level_low  = iLow(this.symbol, this.timeframe, i );
+            this.Levels[arr_size].timeframe  = this.timeframe;
+            this.Levels[arr_size].symbol     = this.symbol;
             
-            if( zz_price == this.ZZLevels[arr_size].level_high )
-              this.ZZLevels[arr_size].type = ZZ_HIGH;
+            if( zz_price == this.Levels[arr_size].level_high )
+              this.Levels[arr_size].type = ZZ_HIGH;
             
-            if( zz_price == this.ZZLevels[arr_size].level_low )
-              this.ZZLevels[arr_size].type = ZZ_LOW;
+            if( zz_price == this.Levels[arr_size].level_low )
+              this.Levels[arr_size].type = ZZ_LOW;
                            
           }          
       }
