@@ -17,6 +17,7 @@ class ClassTrade
       int magic;
     
       ClassOrder Orders[];
+      ClassOrder Order;
       
      //------- Methods ------- 
       int  CreateOrder();
@@ -27,7 +28,6 @@ class ClassTrade
     public:
     
      //------- Properties -------
-      ClassOrder Order;
       ClassTargets Targets;
       ClassAccountingOrders AccountOrders;
      
@@ -38,20 +38,10 @@ class ClassTrade
       bool  OpenOrder();
       void  CloseAllOrders();
       void  TrackOrders();
+      void  TrackOrder();
       void  Init();
       
-      ClassTrade *SetOrder();
-      ClassTrade *Symbol( string symb );
-      ClassTrade *Magic( int magic );
-      ClassTrade *Lot( double lot );
-      ClassTrade *Type( int type );
-      ClassTrade *OpenPrice( double open_price );
-      ClassTrade *StopLoss( double stoploss );
-      ClassTrade *TakeProfit( double takeprofit );
-      ClassTrade *Slippage( int slippage );
-      ClassTrade *Comment( string comment );
-      ClassTrade * Expiration( datetime expiration );
-      ClassTrade *Virtual( bool virtual_ );
+      ClassOrder *SetOrder();
       void Send();
       
       
@@ -64,20 +54,24 @@ void ClassTrade::ClassTrade()
   }
   
   
+  
 //+------------------------------------------------------------------+
 void ClassTrade::~ClassTrade()
   {
   }
   
   
-  
+
+//+-----------------------------------------------------------------+     
 void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
    {
       this.symbol = symbol_;
       this.magic  = magic_;
    }    
    
-//+---------------------------------------------------+   
+   
+   
+//+-----------------------------------------------------------------+   
  void ClassTrade::Init()
    {
       this.AccountOrders.Init( this.symbol, this.magic );
@@ -111,19 +105,16 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
 //+------------------------------------------------------------------+
  bool ClassTrade::OpenOrder()
   {
-    bool res = false;
-    res = this.Order.Send();
+    int i = -1;
+    this.Order.Send();
     
-    if( res )
-      {
-        int i = ArraySize( this.Orders ) - 1;
-        
-        this.CreateOrder();
+    if( this.Order.Ticket > 0 )
+      { 
+        i = this.CreateOrder();
         this.Orders[i].Init( this.Order.Ticket );
         this.Order.Clear();
       }
-    
-    return res;
+    return this.Orders[i].Ticket > 0;
   }
   
   
@@ -159,10 +150,10 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
          {
            if( order.Virtual )
             {
-              if( order.TakeProfit > 0 && Bid <= order.TakeProfit )
+              if( order.TakeProfit > 0 && Ask <= order.TakeProfit )
                order.Close();
                
-              if( order.StopLoss > 0 && Bid >= order.StopLoss )
+              if( order.StopLoss > 0 && Ask >= order.StopLoss )
                order.Close();
                
               return true;
@@ -241,21 +232,28 @@ void ClassTrade::Create( string symbol_ = NULL, int magic_ = NULL )
    {
      for( int i=0; i<ArraySize( this.Orders ); i++ )
        this.TrackOrder( this.Orders[i] );
+   }   
+   
+   
+   
+//+------------------------------------------------------------------+
+ void ClassTrade::TrackOrder()
+   {
+      this.TrackOrder( this.Order );
    }    
    
+     
+//+------------------------------------------------------------------+     
+ ClassOrder *ClassTrade::SetOrder()
+   {
+      this.Order.Clear(); 
+      return ( GetPointer( this.Order ) );
+   }
    
-   
- ClassTrade *ClassTrade::SetOrder()                        {this.Order.Clear();                 return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Symbol( string symb )             {this.Order.Symbol = symb;           return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Magic( int magic_ )               {this.Order.MagicNumber = magic_;    return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Lot( double lot )                 {this.Order.Lot = lot;               return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Type( int type )                  {this.Order.Type = type;             return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::OpenPrice( double open_price )    {this.Order.OpenPrice = open_price;  return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::StopLoss( double stoploss )       {this.Order.StopLoss = stoploss;     return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::TakeProfit( double takeprofit )   {this.Order.TakeProfit = takeprofit; return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Slippage( int slippage )          {this.Order.Slippage = slippage;     return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Comment( string comment )         {this.Order.Comment = comment;       return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Expiration( datetime expiration)  {this.Order.Experation = expiration; return ( GetPointer( this ) );}
- ClassTrade *ClassTrade::Virtual( bool virtual_ )          {this.Order.Virtual = virtual_;      return ( GetPointer( this ) );}
- void ClassTrade::Send()                                   {this.OpenOrder();}
+
+//+------------------------------------------------------------------+   
+ void ClassTrade::Send()
+   {
+      this.OpenOrder();
+   }
    

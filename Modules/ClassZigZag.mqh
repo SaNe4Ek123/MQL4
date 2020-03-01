@@ -66,9 +66,9 @@ void ClassZigZag::~ClassZigZag()
         
         double zz_price;
       
-        HideTestIndicators(true);
+       // HideTestIndicators(true);
           zz_price = iCustom(this.symbol, this.timeframe, "ZigZag", InpDepth, InpDeviation, InpBackstep, 0, i);
-        HideTestIndicators(false);
+       // HideTestIndicators(false);
         if( zz_price > 0 )
           {
             int arr_size = ArraySize(this.Levels);
